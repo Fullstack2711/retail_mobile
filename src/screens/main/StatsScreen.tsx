@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native'
@@ -12,14 +11,14 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { useFocusEffect } from '@react-navigation/native'
 import { Ionicons } from '../../components/icons'
-import { LineChart } from 'react-native-gifted-charts'
+import TrafficLineChart from '../../components/TrafficLineChart'
 import { COLORS } from '../../constants/colors'
 import { useLanguage } from '../../context/LanguageContext'
 import { useTheme } from '../../context/ThemeContext'
 import { useAuth } from '../../context/AuthContext'
+import AppPressable from '../../components/AppPressable'
 import StatCard from '../../components/StatCard'
 import PeriodFilterSheet from '../../components/PeriodFilterSheet'
-import { buyersData as mockBuyers, visitorsData as mockVisitors } from '../../mock/data'
 import { useDeferredMount } from '../../hooks/useDeferredMount'
 import {
   getStatsScreenCache,
@@ -32,7 +31,7 @@ import { HotMapRow, VisitorSurveysCountResponse } from '../../types/storeOwner'
 import { parseGrowthPercent } from '../../utils/formatGrowth'
 import { mapHotMapToRows } from '../../utils/mapHotMap'
 import {
-  computeChartLayout,
+  EMPTY_CHART_DATA,
   mapSlotsToChart,
   type ChartSlotData,
 } from '../../utils/storeOwnerChart'
@@ -167,6 +166,7 @@ export default function StatsScreen() {
       const cached = getStatsScreenCache(period)
       if (cached) {
         applyCache(cached)
+        void fetchStats(period, false).catch(() => {})
         return
       }
 
@@ -227,21 +227,8 @@ export default function StatsScreen() {
     if (stats?.today.slots?.length) {
       return mapSlotsToChart(stats.today.slots)
     }
-    return {
-      visitorsData: mockVisitors.map(({ value }) => ({ value })),
-      buyersData: mockBuyers,
-      maxValue: 400,
-      pointCount: mockVisitors.length,
-      showXLabels: true,
-      useCurved: false,
-      isHourly: false,
-    }
+    return EMPTY_CHART_DATA
   }, [stats?.today.slots])
-
-  const chartLayout = useMemo(
-    () => computeChartLayout(chartData.pointCount, chartWidth, chartData.isHourly),
-    [chartWidth, chartData.pointCount, chartData.isHourly],
-  )
 
   const totalCustomers = stats?.period_summary.total_visitors ?? 0
 
@@ -274,20 +261,20 @@ export default function StatsScreen() {
               {t.stats.subtitle} · {activePeriodLabel}
             </Text>
           </View>
-          <TouchableOpacity
+          <AppPressable
             style={[styles.filterBtn, { backgroundColor: colors.white }]}
             onPress={() => setPeriodSheetVisible(true)}
           >
             <Ionicons name="filter-outline" size={18} color={colors.textPrimary} />
-          </TouchableOpacity>
+          </AppPressable>
         </View>
 
         {error ? (
           <View style={[styles.errorBox, { backgroundColor: colors.white }]}>
             <Text style={[styles.errorText, { color: colors.red }]}>{error}</Text>
-            <TouchableOpacity onPress={() => load(period)}>
+            <AppPressable onPress={() => load(period)}>
               <Text style={{ color: colors.primary, fontWeight: '600' }}>{t.seller.retry}</Text>
-            </TouchableOpacity>
+            </AppPressable>
           </View>
         ) : null}
 
@@ -330,60 +317,17 @@ export default function StatsScreen() {
 
           <View style={styles.chartWrap} onLayout={(e) => setChartWidth(e.nativeEvent.layout.width)}>
             {chartReady && chartWidth > 0 && chartData.visitorsData.length > 0 ? (
-              <LineChart
-                data={chartData.visitorsData}
-                data2={chartData.buyersData}
-                parentWidth={chartWidth}
-                width={chartLayout.plotWidth}
-                disableScroll={!chartLayout.useScroll}
-                nestedScrollEnabled
-                height={chartLayout.chartHeight}
-                curved={chartData.useCurved}
-                thickness={2.5}
-                color1={COLORS.chartPurple}
-                color2={COLORS.chartOrange}
-                dataPointsColor1={COLORS.chartPurple}
-                dataPointsColor2={COLORS.chartOrange}
-                dataPointsRadius={chartData.pointCount > 16 ? 0 : 3}
-                hideDataPoints1={chartData.pointCount > 16}
-                hideDataPoints2
-                maxValue={chartData.maxValue}
-                noOfSections={4}
-                yAxisLabelWidth={chartLayout.yAxisWidth}
-                formatYLabel={(v) => String(Math.round(Number(v)))}
-                yAxisColor="transparent"
-                yAxisTextStyle={{ color: colors.textSecondary, fontSize: 10 }}
-                xAxisColor={colors.border}
-                xAxisThickness={1}
-                xAxisLabelTextStyle={{
-                  color: colors.textSecondary,
-                  fontSize: 10,
-                  width: chartLayout.xLabelWidth,
-                  textAlign: 'center',
-                }}
-                xAxisLabelsHeight={chartLayout.xLabelHeight}
-                labelsExtraHeight={chartLayout.xLabelHeight}
-                xAxisLabelsAtBottom
-                xAxisTextNumberOfLines={1}
-                showVerticalLines={false}
-                rulesColor={colors.border}
-                rulesThickness={1}
-                rulesType="solid"
-                initialSpacing={chartLayout.initialSpacing}
-                endSpacing={chartLayout.endSpacing}
-                spacing={chartLayout.spacing}
-                focusEnabled={!chartLayout.useScroll && chartData.pointCount <= 16}
-                showStripOnFocus={!chartLayout.useScroll && chartData.pointCount <= 16}
-                stripColor={colors.border}
-                stripWidth={1}
-                focusedDataPointRadius={5}
-                focusedDataPointColor={COLORS.chartPurple}
-                showTextOnFocus={!chartLayout.useScroll && chartData.pointCount <= 16}
-                textShiftY={-8}
-                textShiftX={-4}
-                textFontSize={10}
-                dataPointLabelWidth={chartLayout.spacing}
+              <TrafficLineChart
+                key={period}
+                chartWidth={chartWidth}
+                chartData={chartData}
+                labelColor={colors.textSecondary}
+                borderColor={colors.border}
               />
+            ) : chartReady && chartWidth > 0 ? (
+              <Text style={[styles.chartEmpty, { color: colors.textSecondary }]}>
+                {t.stats.chartEmpty}
+              </Text>
             ) : null}
           </View>
         </View>
@@ -569,11 +513,16 @@ const styles = StyleSheet.create({
     minWidth: 60,
   },
   chartWrap: {
-    marginTop: 4,
-    marginBottom: 4,
+    marginTop: 2,
+    marginBottom: 2,
     width: '100%',
-    minHeight: 200,
-    overflow: 'hidden',
+    minHeight: 228,
+    justifyContent: 'center',
+  },
+  chartEmpty: {
+    fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 48,
   },
   hotBars: {
     flexDirection: 'row',

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
@@ -14,6 +13,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import AppPressable from '../../components/AppPressable'
 import { Ionicons } from '../../components/icons'
 import { useTheme } from '../../context/ThemeContext'
 import { useLanguage } from '../../context/LanguageContext'
@@ -58,14 +58,13 @@ export default function EditSavedSurveyScreen({ navigation, route }: Props) {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.bgMain }]} edges={['top']}>
       <View style={styles.topBar}>
-        <TouchableOpacity
+        <AppPressable
           style={[styles.backBtn, { backgroundColor: colors.white }]}
           onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
           disabled={saving}
         >
           <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
-        </TouchableOpacity>
+        </AppPressable>
         <Text style={[styles.screenTitle, { color: colors.textPrimary }]}>
           {t.seller.editTitle}
         </Text>
@@ -95,13 +94,12 @@ export default function EditSavedSurveyScreen({ navigation, route }: Props) {
             <Text style={[styles.dateTime, { color: colors.textSecondary }]}>{dateTime}</Text>
 
             <View style={[styles.toggle, { backgroundColor: colors.bgMain }]}>
-              <TouchableOpacity
+              <AppPressable
                 style={[
                   styles.toggleBtn,
                   status === 'bought' && { backgroundColor: colors.white },
                 ]}
                 onPress={() => setStatus('bought')}
-                activeOpacity={0.8}
                 disabled={saving}
               >
                 <Text
@@ -113,14 +111,13 @@ export default function EditSavedSurveyScreen({ navigation, route }: Props) {
                 >
                   {t.seller.bought}
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </AppPressable>
+              <AppPressable
                 style={[
                   styles.toggleBtn,
                   status === 'not_bought' && { backgroundColor: colors.white },
                 ]}
                 onPress={() => setStatus('not_bought')}
-                activeOpacity={0.8}
                 disabled={saving}
               >
                 <Text
@@ -135,7 +132,7 @@ export default function EditSavedSurveyScreen({ navigation, route }: Props) {
                 >
                   {t.seller.notBought}
                 </Text>
-              </TouchableOpacity>
+              </AppPressable>
             </View>
 
             <Text style={[styles.commentsLabel, { color: colors.textPrimary }]}>
@@ -157,10 +154,10 @@ export default function EditSavedSurveyScreen({ navigation, route }: Props) {
               </Text>
             </View>
 
-            <TouchableOpacity
+            <AppPressable
               style={[styles.saveBtn, { backgroundColor: colors.primary }, saving && styles.saveDisabled]}
               onPress={handleSave}
-              activeOpacity={0.85}
+              rippleColor="rgba(255, 255, 255, 0.2)"
               disabled={saving}
             >
               {saving ? (
@@ -171,7 +168,7 @@ export default function EditSavedSurveyScreen({ navigation, route }: Props) {
                   <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
                 </>
               )}
-            </TouchableOpacity>
+            </AppPressable>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -223,6 +220,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingVertical: 12,
     alignItems: 'center',
+    overflow: 'hidden',
   },
   toggleText: { fontSize: 15, fontWeight: '500' },
   toggleTextActive: { fontWeight: '600' },
@@ -242,6 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
+    overflow: 'hidden',
     marginTop: 8,
   },
   saveDisabled: { opacity: 0.7 },

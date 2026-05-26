@@ -1,0 +1,22 @@
+{
+  "_comment": "Firebase loyiha: retail (retail-56f9a). google-services.json ni Console dan yuklab, android/app/google-services.json deb saqlang. package_name = com.retailsolution.uz bo‘lishi shart (Play Market ID). Skrinshotdagi com.cradle.retail_mobile mos kelmaydi — Firebase da yangi Android app qo‘shing.",
+  "project_info": {
+    "project_number": "458194550273",
+    "project_id": "retail-56f9a",
+    "storage_bucket": "retail-56f9a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458194550273:android:REPLACE_ME",
+        "android_client_info": {
+          "package_name": "com.retailsolution.uz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [{ "current_key": "REPLACE_ME" }],
+      "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+    }
+  ],
+  "configuration_version": "1"
+}

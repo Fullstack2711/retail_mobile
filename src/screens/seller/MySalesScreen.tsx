@@ -6,13 +6,13 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
-  TouchableOpacity,
   Image,
   Platform,
 } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useIsFocused, useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import AppPressable from '../../components/AppPressable'
 import { Ionicons } from '../../components/icons'
 import SaleStatusBadge from '../../components/SaleStatusBadge'
 import { useTheme } from '../../context/ThemeContext'
@@ -199,9 +199,8 @@ export default function MySalesScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: SaleListItem }) => (
-      <TouchableOpacity
+      <AppPressable
         style={[styles.card, { backgroundColor: colors.white }]}
-        activeOpacity={0.7}
         onPress={() => openEdit(item)}
       >
         <View style={styles.cardRow}>
@@ -225,7 +224,7 @@ export default function MySalesScreen() {
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
         </View>
-      </TouchableOpacity>
+      </AppPressable>
     ),
     [colors, openEdit, noCommentLabel],
   )
@@ -250,12 +249,12 @@ export default function MySalesScreen() {
             {total > 0 ? ` · ${items.length}/${total}` : ''}
           </Text>
         </View>
-        <TouchableOpacity
+        <AppPressable
           style={[styles.filterBtn, { backgroundColor: colors.white }]}
           onPress={() => load(true)}
         >
           <Ionicons name="filter" size={18} color={colors.textPrimary} />
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       {loading && !refreshing ? (
@@ -263,9 +262,9 @@ export default function MySalesScreen() {
       ) : error ? (
         <View style={styles.center}>
           <Text style={[styles.errorText, { color: colors.red }]}>{error}</Text>
-          <TouchableOpacity onPress={() => load()}>
+          <AppPressable onPress={() => load()}>
             <Text style={{ color: colors.primary, marginTop: 8 }}>{t.seller.retry}</Text>
-          </TouchableOpacity>
+          </AppPressable>
         </View>
       ) : (
         <FlatList
@@ -331,6 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 12,
     marginBottom: 12,
+    overflow: 'hidden',
   },
   cardRow: {
     flexDirection: 'row',

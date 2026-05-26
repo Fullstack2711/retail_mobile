@@ -1,16 +1,19 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
   View, Text, StyleSheet,
-  TouchableOpacity, ScrollView, Alert, Image,
+  ScrollView, Alert,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { useFocusEffect } from '@react-navigation/native'
 import { Ionicons } from '../../components/icons'
+import AppPressable from '../../components/AppPressable'
 import ProfileItem from '../../components/ProfileItem'
 import LanguageSheet from '../../components/LanguageSheet'
 import ThemeSheet from '../../components/ThemeSheet'
 import ConfirmModal from '../../components/ConfirmModal'
 import EditProfileSheet, { EditProfileField } from '../../components/EditProfileSheet'
+import ProfileAvatar from '../../components/ProfileAvatar'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { useTheme } from '../../context/ThemeContext'
@@ -18,7 +21,7 @@ import { LANGUAGES } from '../../mock/data'
 import { ApiError } from '../../services/api/errors'
 
 export default function ProfileScreen() {
-  const { logout, user, updateProfile } = useAuth()
+  const { logout, user, updateProfile, refreshUserProfile } = useAuth()
   const { theme, colors } = useTheme()
   const { lang, setLang, t } = useLanguage()
   const [langVisible, setLangVisible] = useState(false)
@@ -27,6 +30,12 @@ export default function ProfileScreen() {
   const [editField, setEditField] = useState<EditProfileField | null>(null)
   const [saving, setSaving] = useState(false)
   const tabBarHeight = useBottomTabBarHeight()
+
+  useFocusEffect(
+    useCallback(() => {
+      void refreshUserProfile()
+    }, [refreshUserProfile]),
+  )
 
   const langLabel = LANGUAGES.find((l) => l.code === lang)?.label ?? ''
 
@@ -67,13 +76,13 @@ export default function ProfileScreen() {
         contentContainerStyle={{ paddingBottom: tabBarHeight + 20 }}
       >
         <View style={styles.heroSection}>
-          <View style={[styles.avatarWrap, { backgroundColor: colors.primaryLight, borderColor: colors.border }]}>
-            {user?.image ? (
-              <Image source={{ uri: user.image }} style={styles.avatarImage} />
-            ) : (
-              <Ionicons name="person" size={40} color={colors.primary} />
-            )}
-          </View>
+          <ProfileAvatar
+            imageUrl={user?.image}
+            iconColor={colors.primary}
+            backgroundColor={colors.primaryLight}
+            borderColor={colors.border}
+            style={styles.avatarWrap}
+          />
           <Text style={[styles.heroName, { color: colors.textPrimary }]}>
             {user?.name ?? t.profile.title}
           </Text>
@@ -113,14 +122,14 @@ export default function ProfileScreen() {
           />
         </View>
 
-        <TouchableOpacity
+        <AppPressable
           style={[styles.logoutBtn, { backgroundColor: colors.redLight }]}
           onPress={() => setLogoutVisible(true)}
-          activeOpacity={0.8}
+          rippleColor="rgba(255, 59, 48, 0.12)"
         >
           <Text style={[styles.logoutText, { color: colors.red }]}>{t.profile.logOut}</Text>
           <Ionicons name="log-out-outline" size={20} color={colors.red} />
-        </TouchableOpacity>
+        </AppPressable>
       </ScrollView>
 
       <EditProfileSheet
@@ -158,25 +167,20 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   heroSection: { alignItems: 'center', paddingVertical: 32, gap: 6 },
-  avatarWrap: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    borderWidth: 1,
-    marginBottom: 8,
-  },
-  avatarImage: { width: '100%', height: '100%' },
+  avatarWrap: { marginBottom: 8 },
   heroName: { fontSize: 24, fontWeight: '700' },
   heroSub: { fontSize: 14 },
   section: { paddingHorizontal: 16, gap: 10 },
   logoutBtn: {
-    marginHorizontal: 16, marginTop: 24,
-    borderRadius: 50, paddingVertical: 16,
-    flexDirection: 'row', justifyContent: 'center',
-    alignItems: 'center', gap: 8,
+    marginHorizontal: 16,
+    marginTop: 24,
+    borderRadius: 50,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    overflow: 'hidden',
   },
   logoutText: { fontSize: 16, fontWeight: '600' },
 })

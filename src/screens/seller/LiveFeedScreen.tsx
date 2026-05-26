@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
   Image,
@@ -15,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import AppPressable from '../../components/AppPressable'
 import { Ionicons } from '../../components/icons'
 import { useTheme } from '../../context/ThemeContext'
 import { useLanguage } from '../../context/LanguageContext'
@@ -229,9 +229,8 @@ export default function LiveFeedScreen() {
   const renderItem = useCallback(
     ({ item }: { item: FeedListItem }) => {
       return (
-    <TouchableOpacity
+    <AppPressable
       style={[styles.card, { backgroundColor: colors.white }]}
-      activeOpacity={0.7}
       onPress={() =>
         navigation.navigate('RecordActivity', {
           visitorId: item.visitorId,
@@ -293,7 +292,7 @@ export default function LiveFeedScreen() {
         ) : null}
       </View>
       <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-    </TouchableOpacity>
+    </AppPressable>
       )
     },
     [colors, navigation, t.seller],
@@ -323,12 +322,12 @@ export default function LiveFeedScreen() {
                 : ''}
           </Text>
         </View>
-        <TouchableOpacity
+        <AppPressable
           style={[styles.filterBtn, { backgroundColor: colors.white }]}
           onPress={() => load(true)}
         >
           <Ionicons name="filter" size={18} color={colors.textPrimary} />
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       {loading && !refreshing ? (
@@ -336,9 +335,9 @@ export default function LiveFeedScreen() {
       ) : error ? (
         <View style={styles.center}>
           <Text style={[styles.errorText, { color: colors.red }]}>{error}</Text>
-          <TouchableOpacity onPress={() => load()}>
+          <AppPressable onPress={() => load()}>
             <Text style={{ color: colors.primary, marginTop: 8 }}>{t.seller.retry}</Text>
-          </TouchableOpacity>
+          </AppPressable>
         </View>
       ) : (
         <FlatList
@@ -408,6 +407,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     marginBottom: 10,
+    overflow: 'hidden',
   },
   thumb: {
     width: 64,

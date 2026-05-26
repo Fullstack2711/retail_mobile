@@ -1,6 +1,7 @@
 import { Staff } from '../components/StaffItem'
 import { BranchKey } from '../i18n/translations'
 import { SalesListRaw } from '../types/storeOwner'
+import { resolveMediaUrl } from './resolveMediaUrl'
 
 function resolveBranchKey(row: SalesListRaw): BranchKey {
   const name = String(row.branch_name ?? '').toLowerCase()
@@ -43,7 +44,9 @@ export function mapSalesListToStaff(items: SalesListRaw[]): Staff[] {
         typeof row.total_surveys === 'number' ? row.total_surveys : undefined
       const id = String(row.user_id ?? row.seller_id ?? row.id ?? index)
       const imageUrl =
-        typeof row.image === 'string' && row.image.length > 0 ? row.image : null
+        typeof row.image === 'string' && row.image.length > 0
+          ? resolveMediaUrl(row.image)
+          : null
 
       return {
         id,

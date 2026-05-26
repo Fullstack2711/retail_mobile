@@ -1,5 +1,6 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
+import AppPressable from './AppPressable'
 import { Ionicons } from './icons'
 import { useTheme } from '../context/ThemeContext'
 
@@ -16,10 +17,9 @@ export default function ProfileItem({
 }: ProfileItemProps) {
   const { colors } = useTheme()
   return (
-    <TouchableOpacity
+    <AppPressable
       style={[styles.item, { backgroundColor: colors.white }]}
       onPress={onPress}
-      activeOpacity={0.7}
     >
       <View style={[styles.iconWrap, { backgroundColor: colors.bgMain }]}>
         <Ionicons name={iconName as any} size={18} color={colors.textSecondary} />
@@ -33,14 +33,18 @@ export default function ProfileItem({
       ) : (
         <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
       )}
-    </TouchableOpacity>
+    </AppPressable>
   )
 }
 
 const styles = StyleSheet.create({
   item: {
-    borderRadius: 16, padding: 16,
-    flexDirection: 'row', alignItems: 'center', gap: 12,
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    overflow: 'hidden',
   },
   iconWrap: {
     width: 36, height: 36, borderRadius: 18,

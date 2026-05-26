@@ -1,5 +1,6 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import { View, Text, StyleSheet, Image } from 'react-native'
+import AppPressable from './AppPressable'
 import { Ionicons } from './icons'
 import { useTheme } from '../context/ThemeContext'
 import { useLanguage } from '../context/LanguageContext'
@@ -48,10 +49,9 @@ function StaffItem({ item, onPress }: StaffItemProps) {
   const branchText = item.branchLabel || branchLabel(lang, item.branch)
 
   return (
-    <TouchableOpacity
+    <AppPressable
       style={[styles.card, { backgroundColor: colors.white }]}
       onPress={() => onPress?.(item)}
-      activeOpacity={0.7}
     >
       {item.imageUrl ? (
         <Image source={{ uri: item.imageUrl }} style={styles.avatarImage} resizeMode="cover" />
@@ -93,7 +93,7 @@ function StaffItem({ item, onPress }: StaffItemProps) {
           <Text style={[styles.statHint, { color: colors.textSecondary }]}>{t.team.sold}</Text>
         )}
       </View>
-    </TouchableOpacity>
+    </AppPressable>
   )
 }
 
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     marginBottom: 10,
+    overflow: 'hidden',
   },
   avatar: {
     width: 46,

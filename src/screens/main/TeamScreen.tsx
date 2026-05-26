@@ -5,7 +5,6 @@ import {
   StyleSheet,
   FlatList,
   ScrollView,
-  TouchableOpacity,
   Platform,
   ActivityIndicator,
 } from 'react-native'
@@ -15,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import { Ionicons } from '../../components/icons'
 import { COLORS } from '../../constants/colors'
 import { useTheme } from '../../context/ThemeContext'
+import AppPressable from '../../components/AppPressable'
 import StaffItem, { Staff } from '../../components/StaffItem'
 import { useLanguage } from '../../context/LanguageContext'
 import { useAuth } from '../../context/AuthContext'
@@ -166,20 +166,20 @@ export default function TeamScreen() {
           <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t.team.title}</Text>
           <Text style={[styles.headerSub, { color: colors.textSecondary }]}>{t.team.subtitle}</Text>
         </View>
-        <TouchableOpacity
+        <AppPressable
           style={[styles.filterBtn, { backgroundColor: colors.white }]}
           onPress={() => load(true)}
         >
           <Ionicons name="refresh" size={18} color={colors.textPrimary} />
-        </TouchableOpacity>
+        </AppPressable>
       </View>
 
       {error ? (
         <View style={styles.errorWrap}>
           <Text style={{ color: colors.red, fontSize: 14 }}>{error}</Text>
-          <TouchableOpacity onPress={() => load(true)}>
+          <AppPressable onPress={() => load(true)}>
             <Text style={{ color: colors.primary, fontWeight: '600' }}>{t.seller.retry}</Text>
-          </TouchableOpacity>
+          </AppPressable>
         </View>
       ) : null}
 
@@ -192,11 +192,10 @@ export default function TeamScreen() {
         {branchTabs.map(({ key, label }) => {
           const isActive = activeFilter === key
           return (
-            <TouchableOpacity
+            <AppPressable
               key={key}
               style={[styles.tab, isActive && { backgroundColor: colors.primaryLight }]}
               onPress={() => setActiveFilter(key)}
-              activeOpacity={0.7}
             >
               <Text style={[
                 styles.tabText,
@@ -205,7 +204,7 @@ export default function TeamScreen() {
               ]}>
                 {label}
               </Text>
-            </TouchableOpacity>
+            </AppPressable>
           )
         })}
       </ScrollView>

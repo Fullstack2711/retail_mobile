@@ -15,6 +15,11 @@ export function isHourlySlotTime(time: string): boolean {
   return /^\d{1,2}:\d{2}/.test(t) || /^\d{1,2}$/.test(t)
 }
 
+function isWeekOrMonthLabel(time: string): boolean {
+  const t = time.trim().toLowerCase()
+  return t.startsWith('week') || t.startsWith('hafta') || t.startsWith('month') || t.startsWith('oy')
+}
+
 export function filterChartSlots(slots: VisitorSurveySlot[]): VisitorSurveySlot[] {
   return slots.filter((slot) => {
     const hour = slotHour(slot.time)
@@ -31,10 +36,31 @@ export interface ChartSlotData {
   visitorsData: ChartPoint[]
   buyersData: ChartPoint[]
   maxValue: number
+  buyersMaxValue: number
   pointCount: number
   showXLabels: boolean
   useCurved: boolean
   isHourly: boolean
+}
+
+/** API slots bo‘sh — mock o‘rniga grafik ko‘rsatilmaydi */
+export const EMPTY_CHART_DATA: ChartSlotData = {
+  visitorsData: [],
+  buyersData: [],
+  maxValue: 100,
+  buyersMaxValue: 100,
+  pointCount: 0,
+  showXLabels: false,
+  useCurved: false,
+  isHourly: false,
+}
+
+/** Y-o‘qi raqamlari (0, 60, 225…) kesilmasin */
+export function yAxisWidthForMax(maxValue: number): number {
+  const digits = String(Math.max(0, Math.round(maxValue))).length
+  if (digits <= 2) return 32
+  if (digits === 3) return 40
+  return 48
 }
 
 /** "08:00" → "8" — tor x o‘qida ikki qatorga bo‘linmasin */
@@ -46,9 +72,11 @@ export function formatChartLabel(time: string, hourly: boolean): string {
 
 /** Keskin 0 ga tushishda egri chiziq "hunik" bo‘lib qoladi */
 export function shouldUseCurvedLine(values: number[]): boolean {
-  if (values.length < 3 || values.length > 7) return false
+  if (values.length < 3) return false
+  if (values.length > 31) return false
   const zeroCount = values.filter((v) => v === 0).length
-  return zeroCount < 2
+  if (zeroCount >= 2) return false
+  return true
 }
 
 const MAX_X_LABELS = 6
@@ -88,18 +116,36 @@ export interface ChartLayoutConfig {
   yAxisWidth: number
   initialSpacing: number
   endSpacing: number
+  /** LineChart konteyneri — pastki yorliq va nuqtalar kesilmasin */
+  containerMinHeight: number
+  overflowBottom: number
+  /** X o‘qi yozuvlarini chiziqlardan pastga surish */
+  xLabelVerticalShift: number
+  /** gifted-charts `labelsExtraHeight` proplari — chart View balandligini boshqaradi */
+  labelsExtraHeight: number
 }
 
 export function computeChartLayout(
   pointCount: number,
   containerWidth: number,
   isHourly = false,
+  hasWideLabels = false,
+  maxValue = 100,
 ): ChartLayoutConfig {
-  const yAxisWidth = 44
+  const yAxisWidth = yAxisWidthForMax(maxValue)
   const chartHeight = 168
-  const xLabelHeight = pointCount > 0 ? 20 : 0
-  const xLabelWidth = isHourly ? 28 : pointCount <= 7 ? 44 : 36
-  const initialSpacing = Math.max(16, Math.ceil(xLabelWidth / 2) + 4)
+  const xLabelHeight = pointCount > 0 ? 22 : 0
+  const xLabelVerticalShift = pointCount > 0 ? 12 : 0
+  const overflowBottom = 6
+  // svgWrapper.bottom = 61 + xLabelVerticalShift + labelsExtraHeight - 1
+  // Yorliqlar: bottom 36, balandlik xLabelHeight
+  // gap ≈ labelsExtraHeight + xLabelVerticalShift - 12
+  const labelsExtraHeight = pointCount > 0 ? 24 : 0
+  const containerMinHeight = chartHeight + xLabelHeight + xLabelVerticalShift + overflowBottom + 12
+  const xLabelWidth = isHourly ? 28 : hasWideLabels ? 52 : pointCount <= 7 ? 44 : 36
+  const initialSpacing = isHourly
+    ? Math.max(16, Math.ceil(xLabelWidth / 2) + 4)
+    : Math.max(36, Math.ceil(xLabelWidth / 2) + 14)
   const endSpacing = initialSpacing
 
   const plotAreaWidth = Math.max(0, containerWidth - yAxisWidth)
@@ -116,20 +162,28 @@ export function computeChartLayout(
       yAxisWidth,
       initialSpacing,
       endSpacing,
+      containerMinHeight,
+      overflowBottom,
+      xLabelVerticalShift,
+      labelsExtraHeight,
     }
   }
 
   const innerWidth = Math.max(0, plotAreaWidth - initialSpacing - endSpacing)
   const segmentCount = Math.max(pointCount - 1, 1)
-  const minSpacingPerPoint = isHourly ? 32 : 56
-  const maxSpacingPerPoint = isHourly ? 48 : 96
+  const minSpacingPerPoint = isHourly ? 32 : hasWideLabels ? 64 : 56
+  const maxSpacingPerPoint = isHourly ? 48 : hasWideLabels ? 88 : 96
   const fitSpacing = Math.floor(innerWidth / segmentCount)
   const useScroll = fitSpacing < minSpacingPerPoint
   const spacing = useScroll
     ? minSpacingPerPoint
-    : Math.min(fitSpacing, maxSpacingPerPoint)
+    : Math.min(Math.max(fitSpacing, minSpacingPerPoint), maxSpacingPerPoint)
+
+  const contentWidth = initialSpacing + endSpacing + segmentCount * spacing
   const plotWidth = plotAreaWidth
-  const scrollContentWidth = containerWidth
+  const scrollContentWidth = useScroll
+    ? Math.max(containerWidth, contentWidth + yAxisWidth)
+    : containerWidth
 
   return {
     spacing,
@@ -142,6 +196,10 @@ export function computeChartLayout(
     yAxisWidth,
     initialSpacing,
     endSpacing,
+    containerMinHeight,
+    overflowBottom,
+    xLabelVerticalShift,
+    labelsExtraHeight,
   }
 }
 
@@ -149,6 +207,8 @@ export function mapSlotsToChart(slots: VisitorSurveySlot[]): ChartSlotData {
   const hourly =
     slots.length > 0 && slots.every((slot) => isHourlySlotTime(slot.time))
   const filtered = hourly ? filterChartSlots(slots) : slots
+  const hasWideLabels =
+    !hourly && filtered.some((slot) => isWeekOrMonthLabel(slot.time))
 
   const rawVisitors = filtered.map((slot) => ({
     value: slot.visitors,
@@ -156,11 +216,10 @@ export function mapSlotsToChart(slots: VisitorSurveySlot[]): ChartSlotData {
   }))
   const buyersData = filtered.map((slot) => ({ value: slot.buyers }))
   const visitorValues = filtered.map((slot) => slot.visitors)
-  const peak = filtered.reduce(
-    (max, slot) => Math.max(max, slot.visitors, slot.buyers),
-    0,
-  )
-  const maxValue = computeChartMaxValue(peak)
+  const visitorPeak = filtered.reduce((max, slot) => Math.max(max, slot.visitors), 0)
+  const buyersPeak = filtered.reduce((max, slot) => Math.max(max, slot.buyers), 0)
+  const maxValue = computeChartMaxValue(visitorPeak)
+  const buyersMaxValue = computeChartMaxValue(buyersPeak)
   const labelCap = hourly
     ? MAX_X_LABELS
     : filtered.length > 10
@@ -175,6 +234,7 @@ export function mapSlotsToChart(slots: VisitorSurveySlot[]): ChartSlotData {
     visitorsData: visitorsWithLabels,
     buyersData,
     maxValue,
+    buyersMaxValue,
     pointCount: filtered.length,
     showXLabels: filtered.length > 0,
     useCurved: shouldUseCurvedLine(visitorValues),

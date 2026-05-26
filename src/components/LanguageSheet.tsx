@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react'
 import {
-  View, Text, StyleSheet, TouchableOpacity,
+  View, Text, StyleSheet,
   Modal, Animated, TouchableWithoutFeedback, Dimensions,
 } from 'react-native'
+import AppPressable from './AppPressable'
 import { useLanguage } from '../context/LanguageContext'
 import { useTheme } from '../context/ThemeContext'
 import { LANGUAGES } from '../mock/data'
@@ -62,11 +63,10 @@ export default function LanguageSheet({
           {LANGUAGES.map((lang) => {
             const isSelected = selectedLang === lang.code
             return (
-              <TouchableOpacity
+              <AppPressable
                 key={lang.code}
                 style={[styles.langItem, { backgroundColor: colors.white }]}
                 onPress={() => onSelect(lang.code)}
-                activeOpacity={0.7}
               >
                 <View style={[
                   styles.radio,
@@ -80,7 +80,7 @@ export default function LanguageSheet({
                   {lang.label}
                 </Text>
                 <Text style={styles.flag}>{lang.flag}</Text>
-              </TouchableOpacity>
+              </AppPressable>
             )
           })}
         </View>

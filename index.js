@@ -3,6 +3,7 @@
  */
 
 import 'react-native-gesture-handler';
+import '@react-native-firebase/app';
 import { enableFreeze } from 'react-native-screens';
 import { AppRegistry } from 'react-native';
 

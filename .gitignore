@@ -6,6 +6,9 @@
 .env
 .env.local
 *.env.local
+android/keystore.properties
+android/app/retail-release.keystore
+ios/ExportOptions.plist
 
 # Xcode
 #

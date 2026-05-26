@@ -5,10 +5,10 @@ import {
   StyleSheet,
   Modal,
   Animated,
-  TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native'
 import { Ionicons } from './icons'
+import AppPressable from './AppPressable'
 import { useTheme } from '../context/ThemeContext'
 
 interface ConfirmModalProps {
@@ -98,20 +98,19 @@ export default function ConfirmModal({
           <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
 
           <View style={styles.actions}>
-            <TouchableOpacity
+            <AppPressable
               style={[styles.btn, styles.cancelBtn, { backgroundColor: colors.bgMain }]}
               onPress={onCancel}
-              activeOpacity={0.7}
             >
               <Text style={[styles.cancelText, { color: colors.textPrimary }]}>{cancelLabel}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </AppPressable>
+            <AppPressable
               style={[styles.btn, styles.confirmBtn, { backgroundColor: colors.red }]}
               onPress={onConfirm}
-              activeOpacity={0.8}
+              rippleColor="rgba(255, 255, 255, 0.2)"
             >
               <Text style={styles.confirmText}>{confirmLabel}</Text>
-            </TouchableOpacity>
+            </AppPressable>
           </View>
         </Animated.View>
       </Animated.View>
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   backdropTouchable: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   card: {
     width: '100%',

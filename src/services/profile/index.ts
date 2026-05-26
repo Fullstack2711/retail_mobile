@@ -1,4 +1,5 @@
 export {
+  getSellerProfile,
   patchSellerProfile,
   splitDisplayName,
   buildDisplayNameFromInfo,

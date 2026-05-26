@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
   StyleSheet,
   SafeAreaView,
   KeyboardAvoidingView,
@@ -14,6 +13,7 @@ import {
   Image,
 } from 'react-native'
 import { Ionicons } from '../../components/icons'
+import AppPressable from '../../components/AppPressable'
 import { COLORS } from '../../constants/colors'
 import { useAuth, UnsupportedRoleError } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
@@ -136,21 +136,21 @@ export default function LoginScreen() {
                   secureTextEntry={!showPassword}
                   underlineColorAndroid="transparent"
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <AppPressable onPress={() => setShowPassword(!showPassword)} pressedOpacity={0.7}>
                   <Ionicons
                     name={showPassword ? 'eye' : 'eye-off'}
                     size={20}
                     color={COLORS.textSecondary}
                   />
-                </TouchableOpacity>
+                </AppPressable>
               </View>
               {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
             </View>
 
-            <TouchableOpacity
+            <AppPressable
               style={[styles.loginBtn, isLoading && styles.loginBtnDisabled]}
               onPress={handleLogin}
-              activeOpacity={0.85}
+              rippleColor="rgba(255, 255, 255, 0.2)"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -161,7 +161,7 @@ export default function LoginScreen() {
                   <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
                 </>
               )}
-            </TouchableOpacity>
+            </AppPressable>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -212,10 +212,15 @@ const styles = StyleSheet.create({
   rememberText: { fontSize: 14, color: COLORS.textPrimary },
   forgotText: { fontSize: 14, color: COLORS.textSecondary },
   loginBtn: {
-    backgroundColor: COLORS.primary, borderRadius: 50,
-    paddingVertical: 16, flexDirection: 'row',
-    justifyContent: 'center', alignItems: 'center', gap: 8,
+    backgroundColor: COLORS.primary,
+    borderRadius: 50,
+    paddingVertical: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
     marginTop: 16,
+    overflow: 'hidden',
   },
   loginBtnDisabled: { opacity: 0.7 },
   loginBtnText: { color: COLORS.white, fontSize: 16, fontWeight: '600' },

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Modal,
   Animated,
   TouchableWithoutFeedback,
@@ -13,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native'
+import AppPressable from './AppPressable'
 import { useLanguage } from '../context/LanguageContext'
 import { useTheme } from '../context/ThemeContext'
 
@@ -113,10 +113,10 @@ export default function EditProfileSheet({
             />
           </View>
 
-          <TouchableOpacity
+          <AppPressable
             style={[styles.saveBtn, { backgroundColor: colors.primary }, saving && styles.saveDisabled]}
             onPress={handleSave}
-            activeOpacity={0.85}
+            rippleColor="rgba(255, 255, 255, 0.2)"
             disabled={saving || !value.trim()}
           >
             {saving ? (
@@ -124,11 +124,11 @@ export default function EditProfileSheet({
             ) : (
               <Text style={styles.saveText}>{t.profile.save}</Text>
             )}
-          </TouchableOpacity>
+          </AppPressable>
 
-          <TouchableOpacity style={styles.cancelBtn} onPress={onClose} disabled={saving}>
+          <AppPressable style={styles.cancelBtn} onPress={onClose} disabled={saving}>
             <Text style={[styles.cancelText, { color: colors.textSecondary }]}>{t.profile.cancel}</Text>
-          </TouchableOpacity>
+          </AppPressable>
         </Animated.View>
       </KeyboardAvoidingView>
     </Modal>

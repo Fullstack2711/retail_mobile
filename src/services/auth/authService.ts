@@ -1,5 +1,6 @@
 import { BASE_URL } from '../../config/env'
 import { AuthSession, TokenResponse } from '../../types/auth'
+import { resolveMediaUrl } from '../../utils/resolveMediaUrl'
 import { ApiError, parseApiError } from '../api/errors'
 import { fetchWithTimeout } from '../api/http'
 import { setAuthToken } from '../api/client'
@@ -26,7 +27,7 @@ export function mapTokenToSession(data: TokenResponse): AuthSession {
       phone: data.user_info.phone ?? '',
       email: data.user_info.email,
       username: data.user_info.username,
-      image: data.user_info.image ?? null,
+      image: resolveMediaUrl(data.user_info.image),
       companyName: data.user_info.company?.name ?? null,
       roleName,
     },
@@ -84,7 +85,7 @@ export function clearSession() {
 
 export function mergeSessionProfile(
   session: AuthSession,
-  updates: { name: string; phone: string },
+  updates: { name: string; phone: string; image?: string | null },
 ): AuthSession {
   return {
     ...session,
@@ -92,6 +93,7 @@ export function mergeSessionProfile(
       ...session.user,
       name: updates.name,
       phone: updates.phone,
+      ...(updates.image !== undefined ? { image: updates.image } : {}),
     },
   }
 }

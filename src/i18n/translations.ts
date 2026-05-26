@@ -37,7 +37,7 @@ const uz = {
     periodWeekly: 'Haftalik',
     periodMonthly: 'Oylik',
     hotMapEmpty: "Ma'lumot yo'q",
-    chartScrollHint: 'Barcha kunlarni ko‘rish uchun suring →',
+    chartEmpty: "Grafik uchun ma'lumot yo'q",
   },
   team: {
     title: 'Savdo jamoasi',
@@ -135,7 +135,7 @@ type Messages = {
     periodWeekly: string
     periodMonthly: string
     hotMapEmpty: string
-    chartScrollHint: string
+    chartEmpty: string
   }
   team: {
     title: string
@@ -233,7 +233,7 @@ const ru: Messages = {
     periodWeekly: 'Неделя',
     periodMonthly: 'Месяц',
     hotMapEmpty: 'Нет данных',
-    chartScrollHint: 'Проведите влево/вправо для всех дней →',
+    chartEmpty: 'Нет данных для графика',
   },
   team: {
     title: 'Команда продаж',
@@ -331,7 +331,7 @@ const en: Messages = {
     periodWeekly: 'Weekly',
     periodMonthly: 'Monthly',
     hotMapEmpty: 'No data',
-    chartScrollHint: 'Swipe to see all days →',
+    chartEmpty: 'No chart data available',
   },
   team: {
     title: 'Sales Team',

@@ -3,13 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Modal,
   Animated,
   TouchableWithoutFeedback,
   Dimensions,
 } from 'react-native'
 import { useLanguage } from '../context/LanguageContext'
+import AppPressable from './AppPressable'
 import { useTheme } from '../context/ThemeContext'
 import { STATS_PERIODS, StatsPeriod } from '../types/statsPeriod'
 
@@ -80,11 +80,10 @@ export default function PeriodFilterSheet({
                   ? t.stats.periodWeekly
                   : t.stats.periodMonthly
             return (
-              <TouchableOpacity
+              <AppPressable
                 key={period}
                 style={[styles.item, { backgroundColor: colors.white }]}
                 onPress={() => onSelect(period)}
-                activeOpacity={0.7}
               >
                 <View
                   style={[
@@ -97,7 +96,7 @@ export default function PeriodFilterSheet({
                   ) : null}
                 </View>
                 <Text style={[styles.itemLabel, { color: colors.textPrimary }]}>{label}</Text>
-              </TouchableOpacity>
+              </AppPressable>
             )
           })}
         </View>
@@ -134,6 +133,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     flexDirection: 'row',
     alignItems: 'center',
+    overflow: 'hidden',
     gap: 12,
   },
   radio: {

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react'
 import {
-  View, Text, StyleSheet, TouchableOpacity,
+  View, Text, StyleSheet,
   Modal, Animated, TouchableWithoutFeedback, Dimensions,
 } from 'react-native'
 import { Ionicons } from './icons'
+import AppPressable from './AppPressable'
 import { useLanguage } from '../context/LanguageContext'
 import { useTheme, Theme } from '../context/ThemeContext'
 
@@ -71,18 +72,17 @@ export default function ThemeSheet({ visible, onClose }: ThemeSheetProps) {
           {THEMES.map((t) => {
             const isSelected = theme === t.code
             return (
-              <TouchableOpacity
+              <AppPressable
                 key={t.code}
                 style={[styles.item, { backgroundColor: colors.white }]}
                 onPress={() => handleSelect(t.code)}
-                activeOpacity={0.7}
               >
                 <View style={[styles.radio, { borderColor: isSelected ? colors.primary : colors.border }]}>
                   {isSelected && <View style={[styles.radioDot, { backgroundColor: colors.primary }]} />}
                 </View>
                 <Ionicons name={t.icon as any} size={20} color={colors.textSecondary} />
                 <Text style={[styles.label, { color: colors.textPrimary }]}>{t.label}</Text>
-              </TouchableOpacity>
+              </AppPressable>
             )
           })}
         </View>
