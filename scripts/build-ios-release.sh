@@ -9,10 +9,14 @@ if [[ "$(uname)" != "Darwin" ]]; then
   exit 1
 fi
 
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export RCT_USE_RN_DEP=0
+export RCT_USE_PREBUILT_RNCORE=0
+
 echo "=== CocoaPods ==="
 cd ios
-if command -v bundle >/dev/null 2>&1 && [[ -f ../Gemfile ]]; then
-  bundle install --quiet 2>/dev/null || true
+if command -v bundle >/dev/null 2>&1 && [[ -f ../Gemfile ]] && bundle check >/dev/null 2>&1; then
   bundle exec pod install
 else
   pod install
@@ -33,9 +37,10 @@ xcodebuild \
   -configuration Release \
   -destination "generic/platform=iOS" \
   -archivePath "$ARCHIVE_PATH" \
+  -allowProvisioningUpdates \
   archive \
   CODE_SIGN_STYLE=Automatic \
-  DEVELOPMENT_TEAM="${APPLE_TEAM_ID:-}"
+  DEVELOPMENT_TEAM="${APPLE_TEAM_ID:-XY22SQAUCW}"
 
 if [[ ! -f "$EXPORT_OPTIONS" ]]; then
   echo ""

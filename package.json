@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "postinstall": "node scripts/patch-gesture-handler.js && node scripts/patch-gradle-foojay.js",
+    "postinstall": "node scripts/patch-gesture-handler.js && node scripts/patch-gradle-foojay.js && node scripts/patch-glog-xcode-spaces.js",
     "icons": "bash scripts/generate-app-icons.sh",
     "keystore:android": "bash scripts/create-android-keystore.sh",
     "build:android": "bash scripts/build-android-release.sh",
